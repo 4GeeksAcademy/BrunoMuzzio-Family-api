@@ -32,6 +32,8 @@ def sitemap():
 @app.route('/members', methods=['GET'])
 def get_members():
     members = jackson_family.get_all_members()
+    if members is None:
+        return jsonify({"error": "Members not found"}), 404  
     return jsonify(members), 200
     
 
@@ -39,7 +41,7 @@ def get_members():
 def add_member():
     body = request.get_json()
     if body is None or "first_name" not in body or "age" not in body or "lucky_numbers" not in body:
-        return jsonify({"error": "Body not found"}), 400  
+        return jsonify({"error": "Body incomplete"}), 400  
     jackson_family.add_member(body)
     return jsonify(body), 200
 
@@ -47,7 +49,7 @@ def add_member():
 def remove_member(id):
     member = jackson_family.get_member(id)
     if member is None:
-        return jsonify({"error": "Member not found"}), 400  
+        return jsonify({"error": "Member not found"}), 404  
     jackson_family.delete_member(id)
     return jsonify({"done": True}), 200
 
@@ -55,7 +57,7 @@ def remove_member(id):
 def get_member(id):
     member = jackson_family.get_member(id)
     if member is None:
-        return jsonify({"error": "Member not found"}), 400    
+        return jsonify({"error": "Member not found"}), 404   
     return jsonify(member), 200
 
 # This only runs if `$ python src/app.py` is executed
